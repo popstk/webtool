@@ -5,11 +5,14 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager . --platform=win32 --arch=ia32 --overwrite --ignore=node_modules --ignore=.gitignore"
+    "package": "electron-packager . --platform=win32 --arch=ia32 --electron-version=1.4.15 --overwrite --ignore=node_modules --ignore=.gitignore"
   },
   "keywords": [
     "tool"
   ],
   "author": "ther@live.cn",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "electron-packager": "^9.1.0"
+  }
 }
