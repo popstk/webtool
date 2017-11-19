@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"> 
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">  
+	<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+
+<ul class="nav nav-tabs" id="items">
+  <li v-for="item in items">
+      <a href="#">{{item.name}}</a>
+  </li>
+</ul>
+
+<script>
+  var app4 = new Vue({
+  el: '#items',
+  data: {
+    items: [
+      { name: 'C/C++' },
+      { name: 'Java' },
+      { name: 'Json/XML' },
+      {name: 'Base64'}
+    ]
+  }
+})
+</script>
+
+</body>
+</html>
