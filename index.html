@@ -7,48 +7,39 @@
   <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://unpkg.com/vue"></script>
-
-  <link href="dist/summernote.css" rel="stylesheet">
-  <script src="dist/summernote.js"></script>
 </head>
 
 <body>
-
-  <div class="container ">
+  <div class="container" id="items">
     <ul class="nav nav-tabs" id="items">
       <li v-for="item in items">
-        <a href="#">{{item.name}}</a>
+        <a :href="'#'+item.id" data-toggle="tab">{{item.name}}</a>
       </li>
     </ul>
-    <div class="container ">
-      <div class="row">
-        <div id="summernote">Hello Summernote</div>
+    <div class="tab-content">
+      <div v-for="item in items" class="tab-pane" :id="item.id">
+        <textarea id="input_text" name="input_text" class="form-control" spellcheck="false" :placeholder="item.name"></textarea>
       </div>
-    </div>
+  </div>
   </div>
 
+
   <script>
-    var app4 = new Vue({
+    // import content from './content'
+    new Vue({
       el: '#items',
       data: {
         items: [{
-            name: 'C/C++'
+            name: 'Json/XML',
+            id: 'jsxml'
           },
           {
-            name: 'Java'
-          },
-          {
-            name: 'Json/XML'
-          },
-          {
-            name: 'Base64'
+            name: 'Base64',
+            id: 'base64'
           }
         ]
       }
     })
-    $(document).ready(function () {
-      $('#summernote').summernote();
-    });
   </script>
 
 </body>
