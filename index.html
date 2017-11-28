@@ -26,16 +26,20 @@
 
   <script>
     // import content from './content'
+    import JsonXml from './jsonxml'
+    import Base64 from './base64'
     new Vue({
       el: '#items',
       data: {
         items: [{
             name: 'Json/XML',
-            id: 'jsxml'
+            id: 'jsxml',
+            component: JsonXml
           },
           {
             name: 'Base64',
-            id: 'base64'
+            id: 'base64',
+            component: Base64
           }
         ]
       }
