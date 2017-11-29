@@ -7,43 +7,61 @@
   <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://unpkg.com/vue"></script>
+  <script src="./js/base64.js"></script>
 </head>
 
 <body>
-  <div class="container" id="items">
+  <div class="container">
     <ul class="nav nav-tabs" id="items">
       <li v-for="item in items">
         <a :href="'#'+item.id" data-toggle="tab">{{item.name}}</a>
       </li>
     </ul>
     <div class="tab-content">
-      <div v-for="item in items" class="tab-pane" :id="item.id">
-        <textarea id="input_text" name="input_text" class="form-control" spellcheck="false" :placeholder="item.name"></textarea>
+      <div class="tab-pane" id="jsxml">
+        <textarea id="input_area" name="input_area" class="form-control" spellcheck="false"></textarea>
       </div>
+      <div class="tab-pane" id="base64">
+        <div class="col-md-6">
+          <textarea id="input_text" class="form-control" rows="30" spellcheck="false" placeholder="明文" onkeyup="encode(this.value)"></textarea>
+        </div>
+        <div class="col-md-6">
+          <textarea id="output_text" class="form-control" rows="30" spellcheck="false" placeholder="密文" onkeyup="decode(this.value)"></textarea>
+        </div>
+      </div>
+    </div>
   </div>
-  </div>
-
 
   <script>
     // import content from './content'
-    import JsonXml from './jsonxml'
-    import Base64 from './base64'
     new Vue({
       el: '#items',
       data: {
         items: [{
-            name: 'Json/XML',
-            id: 'jsxml',
-            component: JsonXml
-          },
-          {
-            name: 'Base64',
-            id: 'base64',
-            component: Base64
-          }
-        ]
+          name: 'Base64',
+          id: 'base64'
+        }, {
+          name: 'Json/XML',
+          id: 'jsxml'
+        }]
       }
     })
+  </script>
+
+  <script>
+    $(document).ready(function () {
+      $('#base64').addClass('active');
+    });
+
+    function decode(text) {
+      let res = Base64.decode(text);
+      $('#input_text').val(res);
+    }
+
+    function encode(text) {
+      let res = Base64.encode(text);
+      $('#output_text').val(res);
+    }
   </script>
 
 </body>
