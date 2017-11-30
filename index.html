@@ -14,6 +14,7 @@
     crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vue"></script>
   <script src="./js/base64.js"></script>
+  <script src="./js/json2.js"></script>
 </head>
 
 <body>
@@ -59,8 +60,28 @@
       $('#base64').addClass('active');
     });
 
+    
+
+    function formatter(what) {
+      let text = "";
+      text = text.replace(/^\s+|\s+$/g, "");
+      let text = 'dsafds'
+      if (text.length == 0)
+        return text
+
+      if (text[0]=='<')
+        return text
+    }
+
     function decode(text) {
       let res = Base64.decode(text);
+      try {
+        res = JSON.parse(res);
+        res = JSON.stringify(res, null, 2);
+      } catch (e) {
+        console.log('Not a  Json');
+      }
+
       $('#input_text').val(res);
     }
 
