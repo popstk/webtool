@@ -16,6 +16,12 @@
   <script src="https://unpkg.com/vue"></script>
   <script src="./js/base64.js"></script>
   <script src="./js/vkbeautify.js"></script>
+
+  <link href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css" rel="stylesheet">
+  <script src="http://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
 </head>
 
 <body>
@@ -35,6 +41,12 @@
         </div>
         <div class="col-md-6">
           <textarea id="output_text" class="form-control" rows="30" spellcheck="false" placeholder="密文" onkeyup="decode(this.value)"></textarea>
+        </div>
+        <div class="col-md-6">
+          <div>
+            <pre><code id="preview">
+              </code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -80,6 +92,7 @@
       let res = Base64.decode(text);
       try {
         res = formatter(res);
+        $('#preview').html(res);
       } catch (e) {
         console.log('Unsupported');
       }
@@ -88,6 +101,7 @@
     }
 
     function encode(text) {
+      $('#preview').html(text);
       let res = Base64.encode(text);
       $('#output_text').val(res);
     }
