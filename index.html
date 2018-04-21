@@ -5,8 +5,6 @@
   <meta charset="utf-8">
   <title>Tool</title>
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-  <script src="/static/js/base64.js"></script>
-  <script src="/static/js/vkbeautify.js"></script>
   <style>
     textarea {
       font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimSun, sans-serif;
@@ -14,6 +12,9 @@
   </style>
   <script>
     function formatter(text) {
+      if (typeof text == 'object') {
+        return vkbeautify.json(text, 2)
+      }
       let out = text.replace(/^\s+|\s+$/g, "");
       if (out.length == 0)
         return text
@@ -22,10 +23,18 @@
         return vkbeautify.xml(out)
       else if (out[0] == '{' || out[0] == '[')
         return vkbeautify.json(out, 2)
-      else if (out[out.length - 1] == '}')
-        return vkbeautify.css(out)
-      else
-        return vkbeautify.sql(out)
+    }
+    function b64encode(text) {
+      return Base64.encode(text)
+    }
+    function b64decode(text) {
+      return Base64.decode(text);
+    }
+    function plist2json(text) {
+      return vkbeautify.json(plist.parse(text), 2)
+    }
+    function json2plist(text) {
+      return plist.build(text)
     }
   </script>
 
@@ -35,26 +44,26 @@
   <div id="app">
     <el-container>
       <el-main>
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane label="Base64" name="base64">
-            <el-row>
-              <el-col :span="12">
-                <div class="grid-content bg-purple">
-                  <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="明文" v-model="plaintext"></el-input>
-                </div>
-              </el-col>
-              <el-col :span="12">
-                <div class="grid-content bg-purple-light">
-                  <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="密文" v-model="ciphertext"></el-input>
-                </div>
-              </el-col>
-            </el-row>
-
-          </el-tab-pane>
-          <el-tab-pane label="Json/XML">
-            <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="请输入" v-model="jsxmltext" @keyup.native="format(jsxmltext)"></el-input>
-          </el-tab-pane>
-        </el-tabs>
+        <el-row>
+          <el-col :span="12">
+            <div>
+              <el-button>{{left_type}}</el-button>
+              <el-button v-for="option in left_options" :key="option.text" @click="operation('left', option)">{{option.text}}</el-button>
+            </div>
+            <div class="grid-content bg-purple">
+              <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" v-model="left_text" :change="check('left', left_text)"></el-input>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div>
+              <el-button>{{right_type}}</el-button>
+              <el-button v-for="option in right_options" :key="option.text" @click="operation('right', option)">{{option.text}}</el-button>
+            </div>
+            <div class="grid-content bg-purple-light">
+              <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" v-model="right_text" :change="check('right', right_text)"></el-input>
+            </div>
+          </el-col>
+        </el-row>
       </el-main>
       <el-footer>
       </el-footer>
@@ -65,50 +74,89 @@
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.js"></script>
 <script src="https://unpkg.com/vue"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="./static/js/base64.js"></script>
+<script src="./static/js/vkbeautify.js"></script>
+<script src="./static/js/plist.js"></script>
 <script>
   var Main = {
     data() {
       return {
-        activeName: 'base64',
-        plaintext: '',
-        jsxmltext:''
+        left_options: [],
+        right_options: [],
+        left_text: '',
+        right_text: '',
+        left_type: '纯文本',
+        right_type: '纯文本',
+        tb: {
+          '纯文本': [{
+            func: b64encode,
+            text: 'base64编码'
+          }, {
+            func: b64decode,
+            text: 'base64解码'
+          }],
+          'Json': [{
+            func: formatter,
+            text: '格式化',
+            swap: false
+          }, {
+            func: json2plist,
+            text: '转为plist'
+          }, {
+            func: b64encode,
+            text: 'base64编码'
+          }],
+          'Xml': [{
+            func: formatter,
+            text: '格式化',
+            swap: false
+          }, {
+            func: plist2json,
+            text: 'plist转为json'
+          }, {
+            func: b64encode,
+            text: 'base64编码'
+          }]
+        }
       };
     },
     methods: {
-      format(text){
-        this.jsxmltext = formatter(text);
-        console.log(this.jsxmltext)
+      operation(which, option) {
+        var text = option.func(which == 'left' ? this.left_text : this.right_text)
+        let swap = !(option.swap == false)
+        if ((which == 'left' && !swap) || (which == 'right' && swap)) {
+          this.left_text = text
+        } else {
+          this.right_text = text
+        }
       },
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
-      showErrorBase64() {
-        const h = this.$createElement;
-        this.$notify({
-          title: 'Error',
-          message: h('i', {
-            style: 'color: teal'
-          }, 'Invalid Base64')
-        });
+      check(which, text) {
+        let out = text.replace(/^\s+|\s+$/g, "");
+        var text_type = '纯文本'
+        try {
+          if (out[0] == '<') {
+            let xmlDoc = (new DOMParser()).parseFromString(out, "text/xml");
+            if (xmlDoc.getElementsByTagName("parsererror").length>0)
+              throw 'Invalid Xml'
+            text_type = 'Xml'
+          } else if (out[0] == '{' || out[0] == '[') {
+            vkbeautify.json(out)
+            text_type = 'Json'
+          }
+        } catch (e) {
+          text_type = '纯文本'
+        }
+        let options = this.tb[text_type]
+        if (which == 'left') {
+          this.left_type = text_type
+          this.left_options = options
+        } else {
+          this.right_type = text_type
+          this.right_options = options
+        }
       }
     },
     computed: {
-      ciphertext: {
-        get: function () {
-          return Base64.encode(this.plaintext)
-        },
-        set: function (val) {
-          try {
-            let res = Base64.decode(val);
-            if (res) {
-              this.plaintext = formatter(res)
-            }
-          } catch (e) {
-            this.showErrorBase64()
-            this.plaintext = ''
-          }
-        }
-      }
     }
   };
   var Ctor = Vue.extend(Main)

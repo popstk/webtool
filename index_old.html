@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Tool</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style>
+    textarea {
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimSun, sans-serif;
+    }
+  </style>
+  <script>
+    function formatter(text) {
+      if (typeof text == 'object') {
+          return vkbeautify.json(text, 2)
+      }
+
+      let out = text.replace(/^\s+|\s+$/g, "");
+      if (out.length == 0)
+        return text
+
+      if (out[0] == '<')
+        return vkbeautify.xml(out)
+      else if (out[0] == '{' || out[0] == '[')
+        return vkbeautify.json(out, 2)
+      else if (out[out.length - 1] == '}')
+        return vkbeautify.css(out)
+      else
+        return vkbeautify.sql(out)
+    }
+  </script>
+
+</head>
+
+<body>
+  <div id="app">
+    <el-container>
+      <el-main>
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+
+          <el-tab-pane label="Base64" name="base64">
+            <el-row>
+              <el-col :span="12">
+                <div class="grid-content bg-purple">
+                  <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="明文" v-model="plaintext"></el-input>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="grid-content bg-purple-light">
+                  <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="密文" v-model="ciphertext"></el-input>
+                </div>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+
+          <el-tab-pane label="Json/XML">
+            <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="请输入" v-model="jsxmltext" @keyup.native="format(jsxmltext)"></el-input>
+          </el-tab-pane>
+
+          <el-tab-pane label="Plist">
+            <el-row>
+              <el-col :span="12">
+                <div class="grid-content bg-purple">
+                  <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="plist" v-model="plist_text"></el-input>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="grid-content bg-purple-light">
+                  <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" placeholder="json" v-model="json_text"></el-input>
+                </div>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+
+        </el-tabs>
+      </el-main>
+      <el-footer>
+      </el-footer>
+    </el-container>
+  </div>
+
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="./static/js/base64.js"></script>
+<script src="./static/js/vkbeautify.js"></script>
+<script src="./static/js/plist.js"></script>
+<script>
+  var Main = {
+    data() {
+      return {
+        activeName: 'base64',
+        plaintext: '',
+        jsxmltext: '',
+        plist_text: '',
+      };
+    },
+    methods: {
+      format(text) {
+        this.jsxmltext = formatter(text);
+        console.log(this.jsxmltext)
+      },
+      handleClick(tab, event) {
+        console.log(tab, event);
+      },
+      showErrorBase64() {
+        const h = this.$createElement;
+        this.$notify({
+          title: 'Error',
+          message: h('i', {
+            style: 'color: teal'
+          }, 'Invalid Base64')
+        });
+      }
+    },
+    computed: {
+      json_text: {
+        get: function () {
+          if (this.plist_text) {
+            var text = formatter(plist.parse(this.plist_text))
+            return text
+          }
+        }
+      },
+      ciphertext: {
+        get: function () {
+          return Base64.encode(this.plaintext)
+        },
+        set: function (val) {
+          try {
+            let res = Base64.decode(val);
+            if (res) {
+              this.plaintext = formatter(res)
+            }
+          } catch (e) {
+            this.showErrorBase64()
+            this.plaintext = ''
+          }
+        }
+      }
+    }
+  };
+  var Ctor = Vue.extend(Main)
+  new Ctor().$mount('#app')
+</script>
+
+</html>
