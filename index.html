@@ -6,6 +6,7 @@
   <title>Tool</title>
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
   <style>
+    span,
     textarea {
       font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimSun, sans-serif;
     }
@@ -24,15 +25,19 @@
       else if (out[0] == '{' || out[0] == '[')
         return vkbeautify.json(out, 2)
     }
+
     function b64encode(text) {
       return Base64.encode(text)
     }
+
     function b64decode(text) {
       return Base64.decode(text);
     }
+
     function plist2json(text) {
       return vkbeautify.json(plist.parse(text), 2)
     }
+
     function json2plist(text) {
       return plist.build(text)
     }
@@ -44,24 +49,37 @@
   <div id="app">
     <el-container>
       <el-main>
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
-            <div>
-              <el-button>{{left_type}}</el-button>
-              <el-button v-for="option in left_options" :key="option.text" @click="operation('left', option)">{{option.text}}</el-button>
-            </div>
+            <el-row>
+              <el-col :span="2">
+                <el-button type="text">{{left_type}}</el-button>
+              </el-col>
+              <el-col :span="22">
+                <el-button-group>
+                  <el-button v-for="option in left_options" :key="option.text" @click="operation('left', option)">{{option.text}}</el-button>
+                </el-button-group>
+              </el-col>
+            </el-row>
             <div class="grid-content bg-purple">
-              <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" v-model="left_text" :change="check('left', left_text)"></el-input>
+              <el-input type="textarea" spellcheck="false" :autosize="{ minRows: 10, maxRows: 30 }" v-model="left_text" :change="check('left', left_text)"></el-input>
             </div>
           </el-col>
+
           <el-col :span="12">
-            <div>
-              <el-button>{{right_type}}</el-button>
-              <el-button v-for="option in right_options" :key="option.text" @click="operation('right', option)">{{option.text}}</el-button>
-            </div>
-            <div class="grid-content bg-purple-light">
-              <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 30}" v-model="right_text" :change="check('right', right_text)"></el-input>
-            </div>
+            <el-row>
+              <el-col :span="2">
+                <el-button type="text">{{right_type}}</el-button>
+              </el-col>
+              <el-col :span="22">
+                <el-button-group>
+                  <el-button v-for="option in right_options" :key="option.text" @click="operation('right', option)">{{option.text}}</el-button>
+                </el-button-group>
+              </el-col>
+              <div class="grid-content bg-purple-light">
+                <el-input type="textarea" spellcheck="false" :autosize="{ minRows: 10, maxRows: 30 }" v-model=" right_text " :change="check('right', right_text) "></el-input>
+              </div>
+            </el-row>
           </el-col>
         </el-row>
       </el-main>
@@ -136,7 +154,7 @@
         try {
           if (out[0] == '<') {
             let xmlDoc = (new DOMParser()).parseFromString(out, "text/xml");
-            if (xmlDoc.getElementsByTagName("parsererror").length>0)
+            if (xmlDoc.getElementsByTagName("parsererror").length > 0)
               throw 'Invalid Xml'
             text_type = 'Xml'
           } else if (out[0] == '{' || out[0] == '[') {
@@ -155,8 +173,6 @@
           this.right_options = options
         }
       }
-    },
-    computed: {
     }
   };
   var Ctor = Vue.extend(Main)
